@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Room</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+    <script>
+        var stompClient = null;
+        var roomId = '[[${room.id}]]'; // Получаем roomId из Thymeleaf
+
+        function connect() {
+            var socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/room', function (room) {
+                    updatePlayers(JSON.parse(room.body));
+                });
+                refreshPlayers(); // Загружаем список игроков при подключении
+            });
+        }
+
+        function refreshPlayers() {
+            stompClient.send("/app/refreshPlayers", {}, roomId); // Отправляем roomId на сервер
+        }
+
+        function updatePlayers(room) {
+            var playersList = document.getElementById('players');
+            playersList.innerHTML = '';
+            room.players.forEach(function (player) {
+                var li = document.createElement('li');
+                li.appendChild(document.createTextNode(player.name));
+                if (player.isAdmin) {
+                    li.appendChild(document.createTextNode(' (Admin)'));
+                }
+                playersList.appendChild(li);
+            });
+        }
+
+        window.onload = connect;
+    </script>
+</head>
+<body>
+    <h1>Room <span th:text="${room.id}"></span></h1>
+    <h2>Admin: <span th:text="${room.admin.name}"></span></h2>
+    <h2>Players:</h2>
+    <ul id="players"></ul>
+</body>
+</html>
