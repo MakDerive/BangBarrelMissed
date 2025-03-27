@@ -5,20 +5,43 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
     <script>
-        var stompClient = null;
-        var roomId = '[[${room.id}]]'; // Получаем roomId из Thymeleaf
-
-        function connect() {
-            var socket = new SockJS('/ws');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/room', function (room) {
-                    updatePlayers(JSON.parse(room.body));
-                });
-                refreshPlayers(); // Загружаем список игроков при подключении
-            });
+    var stompClient = null;
+    var roomId = '[[${room.id}]]'; // Получаем roomId из Thymeleaf
+    var playerName = localStorage.getItem('playerName') || '';; // Будет хранить имя игрока
+    if (!localStorage.getItem('playerId')) {
+        localStorage.setItem('playerId', generateId());
+    }
+	var playerId = localStorage.getItem('playerId');
+    function connect() {
+        if (!playerName) {
+        	playerName = prompt("Введите ваше имя:");
+            if (!playerName) {
+                alert("Имя обязательно для входа в комнату!");
+                return;
+            }
+            localStorage.setItem('playerName', playerName);
+            localStorage.setItem('playerId', playerId);
         }
+		
+        var socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            
+            joinRoom(roomId,playerId, playerName);
+            
+            stompClient.subscribe('/topic/room', function (room) {
+                updatePlayers(JSON.parse(room.body));
+            });
+        });
+    }
+
+    function joinRoom(roomId,playerId, playerName) {
+        stompClient.send("/app/joinRoom", {}, JSON.stringify({
+            roomId: roomId,
+            playerId: playerId,
+            playerName: playerName
+        }));
+    }
 
         function refreshPlayers() {
             stompClient.send("/app/refreshPlayers", {}, roomId); // Отправляем roomId на сервер
@@ -36,13 +59,17 @@
                 playersList.appendChild(li);
             });
         }
+        function generateId() {
+            const randomNum = Math.floor(Math.random() * 0x1000000);
+            return randomNum.toString(16).padStart(6, '0');
+        }
 
         window.onload = connect;
     </script>
 </head>
 <body>
     <h1>Room <span th:text="${room.id}"></span></h1>
-    <h2>Admin: <span th:text="${room.admin.name}"></span></h2>
+    <!--  <h2>Admin: <span th:text="${room.admin.name}"></span></h2>-->
     <h2>Players:</h2>
     <ul id="players"></ul>
 </body>

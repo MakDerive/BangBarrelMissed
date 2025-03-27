@@ -13,10 +13,8 @@ public class GameRoom {
     private Player admin;
     private Set<Player> players = new HashSet<>();
 
-    public GameRoom(String id,Player admin) {
+    public GameRoom(String id) {
         this.id = id;
-        this.admin = admin;
-        this.players.add(admin);
     }
     
     public void addPlayer(Player player) {

@@ -27,8 +27,8 @@ public class GameRoomController {
     }
 
     @PostMapping("/create-room")
-    public String createRoom(@RequestParam String adminName) {
-        String roomId = gameRoomService.createRoom(adminName);
+    public String createRoom() {
+        String roomId = gameRoomService.createRoom();
         return "redirect:/room/" + roomId; 
     }
 
@@ -41,10 +41,11 @@ public class GameRoomController {
         }
         return "redirect:/"; 
     }
-
+    
     @PostMapping("/join-room")
-    public String joinRoom(@RequestParam String roomId, @RequestParam String playerName) {
-        gameRoomService.joinRoom(roomId, playerName); 
-        return "redirect:/room/" + roomId; 
+    public String jointRoom(@RequestParam String roomId) {
+    	return "redirect:/room/" + roomId;
     }
+
+
 }

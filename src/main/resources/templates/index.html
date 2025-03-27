@@ -37,15 +37,10 @@
                 inputRoomId.type = 'hidden';
                 inputRoomId.name = 'roomId';
                 inputRoomId.value = room.id;
-                var inputPlayerName = document.createElement('input');
-                inputPlayerName.type = 'text';
-                inputPlayerName.name = 'playerName';
-                inputPlayerName.placeholder = 'Your name';
                 var button = document.createElement('button');
                 button.type = 'submit';
                 button.appendChild(document.createTextNode('Join'));
                 joinForm.appendChild(inputRoomId);
-                joinForm.appendChild(inputPlayerName);
                 joinForm.appendChild(button);
                 li.appendChild(joinForm);
                 roomsList.appendChild(li);
@@ -58,7 +53,6 @@
 <body>
     <h1>Game Rooms</h1>
     <form action="/create-room" method="post">
-        <input type="text" name="adminName" placeholder="Your name (Admin)" required>
         <button type="submit">Create Room</button>
     </form>
     <button onclick="refreshRooms()">Refresh Rooms</button>
