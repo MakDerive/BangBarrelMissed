@@ -6,8 +6,8 @@
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
     <script>
     var stompClient = null;
-    var roomId = '[[${room.id}]]'; // Получаем roomId из Thymeleaf
-    var playerName = localStorage.getItem('playerName') || '';; // Будет хранить имя игрока
+    var roomId = '[[${room.id}]]'; 
+    var playerName = localStorage.getItem('playerName') || '';
     if (!localStorage.getItem('playerId')) {
         localStorage.setItem('playerId', generateId());
     }
@@ -53,8 +53,10 @@
             room.players.forEach(function (player) {
                 var li = document.createElement('li');
                 li.appendChild(document.createTextNode(player.name));
-                if (player.isAdmin) {
-                    li.appendChild(document.createTextNode(' (Admin)'));
+                if (room.adminId === player.id) {
+                    var icon = document.createElement('span');
+                    icon.innerHTML = ' &star;'; // Используем HTML-символ звезды
+                    li.appendChild(icon);
                 }
                 playersList.appendChild(li);
             });
@@ -69,7 +71,6 @@
 </head>
 <body>
     <h1>Room <span th:text="${room.id}"></span></h1>
-    <!--  <h2>Admin: <span th:text="${room.admin.name}"></span></h2>-->
     <h2>Players:</h2>
     <ul id="players"></ul>
 </body>

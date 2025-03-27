@@ -41,13 +41,14 @@ public class GameRoomService {
         boolean playerExists = room.getPlayers().stream()
                 .anyMatch(p -> p.getId().equals(request.getPlayerId()));
         if (room != null && !playerExists) {
-        	if (room.getPlayers().size() == 0) {
-        		Player admin = new Player(playerId,playerName, true);
-        		room.addPlayer(admin); 
-        		room.setAdmin(admin);
-        	} else {
-        		room.addPlayer(new Player(playerId,playerName, false)); 
-        	}
+        	boolean isAdmin = room.getPlayers().isEmpty();
+            Player player = new Player(playerId, playerName, isAdmin);
+            
+            room.addPlayer(player);
+            if (isAdmin) {
+                room.setAdmin(player);
+                System.out.println("Назначен админ: " + playerName);
+            }
         }
         return room;
     }
