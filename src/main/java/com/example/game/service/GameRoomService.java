@@ -37,13 +37,14 @@ public class GameRoomService {
     	String roomId = request.getRoomId();
         String playerId = request.getPlayerId();
         String playerName = request.getPlayerName();
-        System.out.println(playerId);
         GameRoom room = rooms.get(roomId);
         boolean playerExists = room.getPlayers().stream()
                 .anyMatch(p -> p.getId().equals(request.getPlayerId()));
         if (room != null && !playerExists) {
         	if (room.getPlayers().size() == 0) {
-        		room.addPlayer(new Player(playerId,playerName, true)); 
+        		Player admin = new Player(playerId,playerName, true);
+        		room.addPlayer(admin); 
+        		room.setAdmin(admin);
         	} else {
         		room.addPlayer(new Player(playerId,playerName, false)); 
         	}
